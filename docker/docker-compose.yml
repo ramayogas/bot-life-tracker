@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: life_tracker_db
+    restart: always
+    environment:
+      POSTGRES_USER: lifetracker
+      POSTGRES_PASSWORD: lifetracker123
+      POSTGRES_DB: lifetracker_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: ../docker/Dockerfile.backend
+    container_name: life_tracker_backend
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://lifetracker:lifetracker123@db:5432/lifetracker_db
+    volumes:
+      - ../backend:/app
+
+volumes:
+  postgres_data:
